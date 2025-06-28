@@ -9,13 +9,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-spinner { animation: spin 1s linear infinite; }
         .result-card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 1.5rem; }
-        .tooltip { position: relative; cursor: help; }
-        .tooltip .tooltip-text {
-            visibility: hidden; width: 280px; background-color: #1f2937; color: #fff; text-align: left;
-            border-radius: 6px; padding: 8px; position: absolute; z-index: 10; bottom: 125%;
-            left: 50%; margin-left: -140px; opacity: 0; transition: opacity 0.3s; font-size: 0.75rem; line-height: 1.5;
-        }
-        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -26,27 +19,51 @@
         </div>
 
         <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
-            <div class="flex flex-col md:flex-row items-end gap-4">
-                <div class="w-full">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
                     <label for="domain" class="block text-sm font-medium text-gray-700 mb-2">Domain Name</label>
-                    <input type="text" id="domain" placeholder="e.g., yourcompany.com" class="w-full text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="domain" placeholder="e.g., lululemon.com" class="w-full text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <button id="analyze-button" onclick="runAnalysis()" class="w-full md:w-auto bg-blue-600 text-white py-2 px-8 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 text-lg whitespace-nowrap">
-                    Analyze
-                </button>
+                <div>
+                    <label for="sender" class="block text-sm font-medium text-gray-700 mb-2">Sender Email (Optional)</label>
+                    <input type="email" id="sender" placeholder="e.g., guest@lululemon.com" class="w-full text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                 <div>
+                    <label for="esp" class="block text-sm font-medium text-gray-700 mb-2">Email Provider</label>
+                    <select id="esp" class="w-full text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                </div>
             </div>
+            <button id="analyze-button" onclick="runAnalysis()" class="mt-6 w-full bg-blue-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 text-lg">
+                Analyze
+            </button>
         </div>
 
         <div id="results-container" class="hidden"></div>
     </div>
 
 <script>
-    // --- Frontend Logic ---
+    const API_ENDPOINT = '/api/check';
+    const providerDb = {
+        'generic': { name: 'Generic / Other' }, 'google-workspace': { name: 'Google Workspace' },
+        'microsoft365': { name: 'Microsoft 365' }, 'mailchimp': { name: 'Mailchimp' },
+        'sendgrid': { name: 'SendGrid' }, 'klaviyo': { name: 'Klaviyo' }, 'hubspot': { name: 'HubSpot' },
+        'brevo': { name: 'Brevo (Sendinblue)' }, 'mailerlite': { name: 'MailerLite' }, 'postmark': { name: 'Postmark' },
+        'mailgun': { name: 'Mailgun' }, 'amazonses': { name: 'Amazon SES' },
+    };
 
-    const API_ENDPOINT = '/api/check'; // Vercel makes our backend available at this relative path
+    document.addEventListener('DOMContentLoaded', () => {
+        const select = document.getElementById('esp');
+        for (const [key, provider] of Object.entries(providerDb)) {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = provider.name;
+            select.appendChild(option);
+        }
+    });
 
     async function runAnalysis() {
         const domain = document.getElementById('domain').value.trim();
+        const esp = document.getElementById('esp').value;
         if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) {
             alert('Please enter a valid domain name.');
             return;
@@ -58,20 +75,15 @@
         button.disabled = true;
         button.innerHTML = `<div class="w-6 h-6 border-4 border-white border-t-transparent rounded-full loading-spinner mx-auto"></div>`;
         resultsContainer.classList.remove('hidden');
-        resultsContainer.innerHTML = `<div class="text-center p-10"><p class="text-lg text-gray-600">Performing deep analysis on ${domain}...</p></div>`;
+        resultsContainer.innerHTML = `<div class="text-center p-10"><p class="text-lg text-gray-600">Contacting your kitchen to prepare an analysis of ${domain}...</p></div>`;
 
         try {
-            const response = await fetch(`${API_ENDPOINT}?domain=${domain}`);
+            const response = await fetch(`${API_ENDPOINT}?domain=${domain}&esp=${esp}`);
             const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'An unknown error occurred.');
-            }
-            
+            if (!response.ok) throw new Error(data.error || 'The kitchen is closed. The API failed to respond.');
             displayResults(domain, data);
-
         } catch (error) {
-            resultsContainer.innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-md"><h3 class="font-bold">Analysis Failed</h3><p>${error.message}</p></div>`;
+            resultsContainer.innerHTML = `<div class="result-card bg-red-50"><h3 class="font-bold text-red-700">Analysis Failed</h3><p class="text-red-600">${error.message}</p></div>`;
         } finally {
             button.disabled = false;
             button.innerHTML = 'Analyze';
@@ -79,12 +91,9 @@
     }
     
     function displayResults(domain, data) {
-        const resultsContainer = document.getElementById('results-container');
-        
         const score = calculateOverallScore(data);
         const grade = getGradeInfo(score);
-        
-        const resultsHTML = `
+        document.getElementById('results-container').innerHTML = `
             <div class="result-card mb-8">
                 <div class="flex flex-col md:flex-row items-center justify-between">
                     <div class="text-center md:text-left mb-6 md:mb-0">
@@ -101,141 +110,94 @@
                     </div>
                 </div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                ${createCardHTML(data.spf, getSpfDetails)}
-                ${createCardHTML(data.dkim, getDkimDetails)}
-                ${createCardHTML(data.dmarc, getDmarcDetails)}
-                ${createCardHTML(data.mx, getMxDetails)}
-                ${createCardHTML(data.bimi, getGenericDetails)}
-                ${createCardHTML(data.mtaSts, getGenericDetails)}
+                ${createCardHTML(data.spf, getSpfDetails)} ${createCardHTML(data.dkim, getGenericDetails)}
+                ${createCardHTML(data.dmarc, getDmarcDetails)} ${createCardHTML(data.mx, getGenericDetails)}
+                ${createCardHTML(data.bimi, getGenericDetails)} ${createCardHTML(data.mtaSts, getGenericDetails)}
             </div>
         `;
-        
-        resultsContainer.innerHTML = resultsHTML;
     }
 
-    // --- Scoring Logic ---
     function calculateOverallScore(data) {
         let totalScore = 0;
-        // SPF: max 30
-        if(data.spf.status === 'pass') {
+        if(data?.spf?.status === 'pass') {
             totalScore += 15;
             if(!data.spf.warnings || data.spf.warnings.length === 0) totalScore += 15;
-            if(data.spf.warnings && data.spf.warnings.some(w => w.includes('lookups'))) totalScore -= 10;
+            if(data.spf.warnings?.some(w => w.includes('lookups'))) totalScore -= 10;
         }
-
-        // DKIM: max 25
-        if(data.dkim.status === 'pass') totalScore += 25;
-
-        // DMARC: max 35
-        if(data.dmarc.status === 'pass') {
+        if(data?.dkim?.status === 'pass') totalScore += 25;
+        if(data?.dmarc?.status === 'pass') {
             totalScore += 10;
             if(data.dmarc.policy === 'quarantine') totalScore += 10;
             if(data.dmarc.policy === 'reject') totalScore += 20;
             if(data.dmarc.rua) totalScore += 5;
         }
-
-        // MX: max 5
-        if(data.mx.status === 'pass') totalScore += 5;
-
-        // BIMI & MTA-STS: max 2.5 each
-        if(data.bimi.status === 'pass') totalScore += 2.5;
-        if(data.mtaSts.status === 'pass') totalScore += 2.5;
-
-        return Math.round(totalScore);
+        if(data?.mx?.status === 'pass') totalScore += 5;
+        if(data?.bimi?.status === 'pass') totalScore += 2.5;
+        if(data?.mtaSts?.status === 'pass') totalScore += 2.5;
+        return Math.max(0, Math.round(totalScore));
     }
 
     function getGradeInfo(score) {
-        if (score >= 90) return { grade: 'A+', color: '#22c55e', description: 'Excellent Configuration' };
-        if (score >= 80) return { grade: 'A', color: '#84cc16', description: 'Strong Configuration' };
-        if (score >= 70) return { grade: 'B', color: '#facc15', description: 'Good, with room to improve' };
-        if (score >= 50) return { grade: 'C', color: '#f97316', description: 'Needs Attention' };
-        return { grade: 'F', color: '#ef4444', description: 'Critical Issues Found' };
+        if (score >= 90) return { color: '#22c55e', description: 'Excellent Configuration' };
+        if (score >= 80) return { color: '#84cc16', description: 'Strong Configuration' };
+        if (score >= 70) return { color: '#facc15', description: 'Good, with room to improve' };
+        if (score >= 50) return { color: '#f97316', description: 'Needs Attention' };
+        return { color: '#ef4444', description: 'Critical Issues Found' };
     }
 
-    // --- HTML Generation for Cards ---
-    function createCardHTML(checkData, detailGenerator) {
-        const { title, details, icon, color } = detailGenerator(checkData);
-        return `
-            <div class="result-card">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-xl font-bold text-gray-800">${title}</h3>
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl" style="background-color: ${color}20; color: ${color};">${icon}</div>
-                </div>
-                <div class="text-left text-sm text-gray-700 space-y-2">${details}</div>
+    function createCardHTML(data, detailGenerator) {
+        const { title, details, icon, color } = detailGenerator(data);
+        return `<div class="result-card">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xl font-bold text-gray-800">${title}</h3>
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl" style="background-color: ${color}20; color: ${color};">${icon}</div>
             </div>
-        `;
+            <div class="text-left text-sm text-gray-700 space-y-2">${details}</div>
+        </div>`;
     }
-    
-    // --- Detail Generators for each check type ---
+
     function getGenericDetails(data) {
-        let details = `<p>${data.info}</p>`;
         return {
-            title: data.name,
-            icon: data.status === 'pass' ? '✓' : '✗',
-            color: data.status === 'pass' ? '#22c55e' : '#ef4444',
-            details: details
+            title: data?.name || 'Unknown',
+            details: `<p class="font-semibold">${data?.info || 'Analysis could not be completed.'}</p>`,
+            icon: data?.status === 'pass' ? '✓' : '✗',
+            color: data?.status === 'pass' ? '#22c55e' : '#ef4444',
         };
     }
     
     function getSpfDetails(data) {
-        let details = `<p class="font-semibold">${data.info}</p>`;
-        if(data.warnings && data.warnings.length > 0) {
-            details += `<ul class="list-disc list-inside mt-2 text-red-600">`;
+        let details = `<p class="font-semibold">${data?.info || 'N/A'}</p>`;
+        if(data?.warnings?.length > 0) {
+            details += `<ul class="list-disc list-inside mt-2 text-red-600 font-semibold">`;
             data.warnings.forEach(w => { details += `<li>${w}</li>`; });
             details += `</ul>`;
         }
+        const isFullyPassing = data?.status === 'pass' && data?.warnings?.length === 0;
         return {
             title: 'SPF',
-            icon: data.status === 'pass' && (!data.warnings || data.warnings.length === 0) ? '✓' : '✗',
-            color: data.status === 'pass' && (!data.warnings || data.warnings.length === 0) ? '#22c55e' : '#ef4444',
-            details: details
-        };
-    }
-
-    function getDkimDetails(data) {
-        let details = `<p class="font-semibold">${data.info}</p>`;
-        if(data.status === 'fail') {
-             details += `<p class="text-xs text-gray-500 mt-2">Note: We check for common public selectors. If you use a custom selector, it may not be found by this tool.</p>`;
-        }
-        return {
-            title: 'DKIM',
-            icon: data.status === 'pass' ? '✓' : '✗',
-            color: data.status === 'pass' ? '#22c55e' : '#ef4444',
-            details: details
+            details,
+            icon: isFullyPassing ? '✓' : '✗',
+            color: isFullyPassing ? '#22c55e' : '#ef4444',
         };
     }
 
     function getDmarcDetails(data) {
-        let details = `<p class="font-semibold">${data.info}</p>`;
-        if (data.status === 'pass') {
+        let details = `<p class="font-semibold">${data?.info || 'N/A'}</p>`;
+        if (data?.status === 'pass') {
             details += `<div class="mt-2 text-xs space-y-1">
                 <p><strong>Policy:</strong> <span class="font-mono bg-gray-100 px-1 rounded">${data.policy || 'N/A'}</span></p>
-                <p><strong>Reporting Enabled:</strong> ${data.rua ? 'Yes' : 'No'}</p>
+                <p><strong>Reporting (rua):</strong> ${data.rua ? 'Enabled' : 'Not Found'}</p>
             </div>`;
         }
+        const isSecure = data?.status === 'pass' && data?.policy !== 'none';
         return {
             title: 'DMARC',
-            icon: data.status === 'pass' && data.policy !== 'none' ? '✓' : '!',
-            color: data.status === 'pass' ? (data.policy === 'reject' ? '#22c55e' : '#f97316') : '#ef4444',
-            details: details
+            details,
+            icon: isSecure ? '✓' : '!',
+            color: data?.status !== 'pass' ? '#ef4444' : (data.policy === 'reject' ? '#22c55e' : '#f97316'),
         };
     }
-    
-    function getMxDetails(data) {
-        let details = `<p class="font-semibold">${data.info}</p>`;
-        if (data.status === 'pass') {
-            details += `<p class="text-xs text-gray-500 mt-2">Mail servers found, your domain can receive email.</p>`;
-        }
-        return {
-            title: 'MX Records',
-            icon: data.status === 'pass' ? '✓' : '✗',
-            color: data.status === 'pass' ? '#22c5f0' : '#ef4444',
-            details: details
-        };
-    }
-
 </script>
 </body>
 </html>
