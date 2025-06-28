@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Compliance Checker</title>
+    <title>MailComply - Modern DMARC Monitoring</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -11,59 +11,95 @@
         .result-card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 1.5rem; }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <div class="container mx-auto px-4 py-12 max-w-5xl">
-        <div class="text-center mb-10">
-            <h1 class="text-5xl font-bold text-gray-900 mb-3">Email Compliance Checker</h1>
-            <p class="text-xl text-gray-600">A powerful, real-time analysis of your domain's email security.</p>
-        </div>
+<body class="bg-white font-sans">
+    <main class="flex min-h-screen w-full flex-col">
+      <header class="flex h-16 shrink-0 items-center justify-between border-b px-4 md:px-6">
+        <a href="/" class="text-2xl font-bold text-gray-900">
+          MailComply
+        </a>
+        <a
+          href="#"
+          onclick="document.getElementById('analysis-section').scrollIntoView({ behavior: 'smooth' });"
+          class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-500"
+        >
+          Check Domain
+        </a>
+      </header>
 
-        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div>
-                    <label for="domain" class="block text-sm font-medium text-gray-700 mb-2">Domain Name</label>
-                    <input type="text" id="domain" placeholder="e.g., lululemon.com" class="w-full text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label for="sender" class="block text-sm font-medium text-gray-700 mb-2">Sender Email (Optional)</label>
-                    <input type="email" id="sender" placeholder="e.g., guest@lululemon.com" class="w-full text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                 <div>
-                    <label for="esp" class="block text-sm font-medium text-gray-700 mb-2">Email Provider</label>
-                    <select id="esp" class="w-full text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+      <section class="flex flex-col items-center bg-gray-50 px-4 py-20 text-center sm:py-24">
+        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+          Stop DMARC Guesswork.
+        </h1>
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
+          MailComply turns confusing DMARC reports into actionable insights.
+          Protect your domain, improve deliverability, and block phishing attacks
+          with ease.
+        </p>
+        <div class="mt-8">
+          <a
+            href="#"
+            onclick="document.getElementById('analysis-section').scrollIntoView({ behavior: 'smooth' });"
+            class="rounded-md bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-sm transition-colors hover:bg-blue-500"
+          >
+            Analyze Your Domain for Free
+          </a>
+        </div>
+      </section>
+
+      <section class="w-full py-20 sm:py-24">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+          <div class="mx-auto max-w-2xl text-center">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              A smarter way to manage email security.
+            </h2>
+            <p class="mt-4 text-lg text-gray-600">
+              Go from complex reports to full domain protection in three simple steps.
+            </p>
+          </div>
+          <div class="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+            <div class="flex flex-col items-center text-center">
+                <div class="relative h-48 w-48"><img src="/step-1-ingest.png" alt="Ingest Reports"></div>
+                <h3 class="mt-6 text-xl font-semibold leading-7 text-gray-900">Step 1: Ingest Reports</h3>
+                <p class="mt-2 text-base leading-7 text-gray-600">Our powerful engine ingests and parses complex DMARC, SPF, and DKIM data from any domain.</p>
+            </div>
+            <div class="flex flex-col items-center text-center">
+                <div class="relative h-48 w-48"><img src="/step-2-insight.png" alt="Gain Insight"></div>
+                <h3 class="mt-6 text-xl font-semibold leading-7 text-gray-900">Step 2: Gain Insight</h3>
+                <p class="mt-2 text-base leading-7 text-gray-600">We provide a simple score and clear visuals, showing you exactly what’s working and what isn’t.</p>
+            </div>
+            <div class="flex flex-col items-center text-center">
+                <div class="relative h-48 w-48"><img src="/step-3-control.png" alt="Take Control"></div>
+                <h3 class="mt-6 text-xl font-semibold leading-7 text-gray-900">Step 3: Take Control</h3>
+                <p class="mt-2 text-base leading-7 text-gray-600">Our actionable advice helps you authorize legitimate senders and block phishing attacks for good.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="analysis-section" class="w-full bg-gray-50 py-20 sm:py-24">
+         <div class="container mx-auto px-4 max-w-5xl">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="flex flex-col md:flex-row items-end gap-4">
+                    <div class="w-full">
+                        <label for="domain" class="block text-sm font-medium text-gray-700 mb-2">Domain Name</label>
+                        <input type="text" id="domain" placeholder="e.g., yourcompany.com" class="w-full text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button id="analyze-button" onclick="runAnalysis()" class="w-full md:w-auto bg-blue-600 text-white py-2 px-8 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 text-lg whitespace-nowrap">
+                        Analyze
+                    </button>
                 </div>
             </div>
-            <button id="analyze-button" onclick="runAnalysis()" class="mt-6 w-full bg-blue-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 text-lg">
-                Analyze
-            </button>
+            <div id="results-container" class="hidden mt-8"></div>
         </div>
+      </section>
 
-        <div id="results-container" class="hidden"></div>
-    </div>
-
+    </main>
 <script>
-    const API_ENDPOINT = '/api/check';
-    const providerDb = {
-        'generic': { name: 'Generic / Other' }, 'google-workspace': { name: 'Google Workspace' },
-        'microsoft365': { name: 'Microsoft 365' }, 'mailchimp': { name: 'Mailchimp' },
-        'sendgrid': { name: 'SendGrid' }, 'klaviyo': { name: 'Klaviyo' }, 'hubspot': { name: 'HubSpot' },
-        'brevo': { name: 'Brevo (Sendinblue)' }, 'mailerlite': { name: 'MailerLite' }, 'postmark': { name: 'Postmark' },
-        'mailgun': { name: 'Mailgun' }, 'amazonses': { name: 'Amazon SES' },
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const select = document.getElementById('esp');
-        for (const [key, provider] of Object.entries(providerDb)) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = provider.name;
-            select.appendChild(option);
-        }
-    });
+    // This is the same JavaScript logic from our original index.html file that calls our API engine.
+    const API_ENDPOINT = '/api/check'; 
 
     async function runAnalysis() {
         const domain = document.getElementById('domain').value.trim();
-        const esp = document.getElementById('esp').value;
         if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) {
             alert('Please enter a valid domain name.');
             return;
@@ -75,15 +111,20 @@
         button.disabled = true;
         button.innerHTML = `<div class="w-6 h-6 border-4 border-white border-t-transparent rounded-full loading-spinner mx-auto"></div>`;
         resultsContainer.classList.remove('hidden');
-        resultsContainer.innerHTML = `<div class="text-center p-10"><p class="text-lg text-gray-600">Contacting your kitchen to prepare an analysis of ${domain}...</p></div>`;
+        resultsContainer.innerHTML = `<div class="text-center p-10"><p class="text-lg text-gray-600">Performing deep analysis on ${domain}...</p></div>`;
 
         try {
-            const response = await fetch(`${API_ENDPOINT}?domain=${domain}&esp=${esp}`);
+            const response = await fetch(`${API_ENDPOINT}?domain=${domain}`);
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'The kitchen is closed. The API failed to respond.');
+
+            if (!response.ok) {
+                throw new Error(data.error || 'An unknown error occurred.');
+            }
+            
             displayResults(domain, data);
+
         } catch (error) {
-            resultsContainer.innerHTML = `<div class="result-card bg-red-50"><h3 class="font-bold text-red-700">Analysis Failed</h3><p class="text-red-600">${error.message}</p></div>`;
+            resultsContainer.innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-md"><h3 class="font-bold">Analysis Failed</h3><p>${error.message}</p></div>`;
         } finally {
             button.disabled = false;
             button.innerHTML = 'Analyze';
@@ -91,9 +132,12 @@
     }
     
     function displayResults(domain, data) {
+        const resultsContainer = document.getElementById('results-container');
+        
         const score = calculateOverallScore(data);
         const grade = getGradeInfo(score);
-        document.getElementById('results-container').innerHTML = `
+        
+        const resultsHTML = `
             <div class="result-card mb-8">
                 <div class="flex flex-col md:flex-row items-center justify-between">
                     <div class="text-center md:text-left mb-6 md:mb-0">
@@ -110,12 +154,18 @@
                     </div>
                 </div>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                ${createCardHTML(data.spf, getSpfDetails)} ${createCardHTML(data.dkim, getGenericDetails)}
-                ${createCardHTML(data.dmarc, getDmarcDetails)} ${createCardHTML(data.mx, getGenericDetails)}
-                ${createCardHTML(data.bimi, getGenericDetails)} ${createCardHTML(data.mtaSts, getGenericDetails)}
+                ${createCardHTML(data.spf, getSpfDetails)}
+                ${createCardHTML(data.dkim, getDkimDetails)}
+                ${createCardHTML(data.dmarc, getDmarcDetails)}
+                ${createCardHTML(data.mx, getMxDetails)}
+                ${createCardHTML(data.bimi, getGenericDetails)}
+                ${createCardHTML(data.mtaSts, getGenericDetails)}
             </div>
         `;
+        
+        resultsContainer.innerHTML = resultsHTML;
     }
 
     function calculateOverallScore(data) {
@@ -139,11 +189,11 @@
     }
 
     function getGradeInfo(score) {
-        if (score >= 90) return { color: '#22c55e', description: 'Excellent Configuration' };
-        if (score >= 80) return { color: '#84cc16', description: 'Strong Configuration' };
-        if (score >= 70) return { color: '#facc15', description: 'Good, with room to improve' };
-        if (score >= 50) return { color: '#f97316', description: 'Needs Attention' };
-        return { color: '#ef4444', description: 'Critical Issues Found' };
+        if (score >= 90) return { grade: 'A+', color: '#22c55e', description: 'Excellent Configuration' };
+        if (score >= 80) return { grade: 'A', color: '#84cc16', description: 'Strong Configuration' };
+        if (score >= 70) return { grade: 'B', color: '#facc15', description: 'Good, with room to improve' };
+        if (score >= 50) return { grade: 'C', color: '#f97316', description: 'Needs Attention' };
+        return { grade: 'F', color: '#ef4444', description: 'Critical Issues Found' };
     }
 
     function createCardHTML(data, detailGenerator) {
@@ -156,7 +206,7 @@
             <div class="text-left text-sm text-gray-700 space-y-2">${details}</div>
         </div>`;
     }
-
+    
     function getGenericDetails(data) {
         return {
             title: data?.name || 'Unknown',
@@ -182,6 +232,19 @@
         };
     }
 
+    function getDkimDetails(data) {
+        let details = `<p class="font-semibold">${data?.info || 'N/A'}</p>`;
+        if(data?.status === 'fail') {
+             details += `<p class="text-xs text-gray-500 mt-2">Note: We check for common public selectors. If you use a custom selector, it may not be found by this tool.</p>`;
+        }
+        return {
+            title: 'DKIM',
+            details: details,
+            icon: data?.status === 'pass' ? '✓' : '✗',
+            color: data?.status === 'pass' ? '#22c55e' : '#ef4444',
+        };
+    }
+
     function getDmarcDetails(data) {
         let details = `<p class="font-semibold">${data?.info || 'N/A'}</p>`;
         if (data?.status === 'pass') {
@@ -198,6 +261,20 @@
             color: data?.status !== 'pass' ? '#ef4444' : (data.policy === 'reject' ? '#22c55e' : '#f97316'),
         };
     }
+    
+    function getMxDetails(data) {
+        let details = `<p class="font-semibold">${data?.info || 'N/A'}</p>`;
+        if (data?.status === 'pass') {
+            details += `<p class="text-xs text-gray-500 mt-2">Mail servers found, your domain can receive email.</p>`;
+        }
+        return {
+            title: 'MX Records',
+            details: details,
+            icon: data?.status === 'pass' ? '✓' : '✗',
+            color: data?.status === 'pass' ? '#22c5f0' : '#ef4444',
+        };
+    }
+
 </script>
 </body>
 </html>
